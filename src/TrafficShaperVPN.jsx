@@ -87,34 +87,21 @@ export default class TrafficShaperVPN extends React.Component {
               destinationIp,
               destinationPort
             }) => {
-              console.log(
-                "onchange",
-                protocol,
-                sourceIp,
-                sourcePort,
-                destinationIp,
-                destinationPort
-              );
-              this.setState(
-                (prevState) => {
-                  const editingData = {
-                    protocol: protocol || prevState.editingData.protocol,
-                    sourceIp: sourceIp || prevState.editingData.sourceIp,
-                    sourcePort: sourcePort || prevState.editingData.sourcePort,
-                    destinationIp:
-                      destinationIp || prevState.editingData.destinationIp,
-                    destinationPort:
-                      destinationPort || prevState.editingData.destinationPort
-                  };
-                  editingData.name = makeNameFromEditingData(editingData);
-                  return {
-                    editingData
-                  };
-                },
-                () => {
-                  console.log("state", this.state.editingData);
-                }
-              );
+              this.setState((prevState) => {
+                const editingData = {
+                  protocol: protocol || prevState.editingData.protocol,
+                  sourceIp: sourceIp || prevState.editingData.sourceIp,
+                  sourcePort: sourcePort || prevState.editingData.sourcePort,
+                  destinationIp:
+                    destinationIp || prevState.editingData.destinationIp,
+                  destinationPort:
+                    destinationPort || prevState.editingData.destinationPort
+                };
+                editingData.name = makeNameFromEditingData(editingData);
+                return {
+                  editingData
+                };
+              });
             }}
             submit={() => this.props.addOrUpdate(this.state.editingData)}
           />
