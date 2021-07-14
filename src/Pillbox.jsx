@@ -10,7 +10,8 @@ export default function WithPillbox(WrappedComponent) {
         isDropdownOpen: false,
         editingTokenId: null
       };
-      this.addOrUpdate = this.addOrUpdate.bind(this);
+      this.addToken = this.addToken.bind(this);
+      this.updateToken = this.updateToken.bind(this);
       this.removeToken = this.removeToken.bind(this);
       this.closeDropdown = this.closeDropdown.bind(this);
     }
@@ -18,33 +19,35 @@ export default function WithPillbox(WrappedComponent) {
       this.setState({ activeTab });
     }
     removeToken(index) {
+      console.log("removeToken", index, this.state.tokens);
       this.setState((prevState) => {
         return {
           tokens: prevState.tokens.filter((token, i) => i !== index)
         };
       });
     }
-    addOrUpdate(token) {
-      const { tokens, editingTokenId } = this.state;
-      // If token already exists, update it
-      if (tokens[editingTokenId]) {
+    updateToken(token, index) {
+      const { tokens } = this.state;
+      if (tokens[index]) {
         this.setState((prevState) => {
           return {
             tokens: [
-              ...prevState.tokens.slice(0, editingTokenId),
+              ...prevState.tokens.slice(0, index),
               token,
-              ...prevState.tokens.slice(editingTokenId + 1)
+              ...prevState.tokens.slice(index + 1)
             ]
           };
         });
       } else {
-        // otherwise add it:
-        this.setState((prevState) => {
-          return {
-            tokens: [...prevState.tokens, token]
-          };
-        });
+        console.error("Could not update token at index", index);
       }
+    }
+    addToken(token) {
+      this.setState((prevState) => {
+        return {
+          tokens: [...prevState.tokens, token]
+        };
+      });
     }
     openDropdown(editingTokenId = null) {
       this.setState({
@@ -112,7 +115,8 @@ export default function WithPillbox(WrappedComponent) {
                 {this.state.isDropdownOpen && (
                   <WrappedComponent
                     tokens={this.state.tokens}
-                    addOrUpdate={this.addOrUpdate}
+                    addToken={this.addToken}
+                    updateToken={this.updateToken}
                     removeToken={this.removeToken}
                     editingTokenId={this.state.editingTokenId}
                     closeDropdown={this.closeDropdown}

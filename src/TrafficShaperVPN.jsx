@@ -24,12 +24,12 @@ export default class TrafficShaperVPN extends React.Component {
   }
   componentDidUpdate(prevProps) {
     // When the token that is being edited changes, run init code
-    if (this.props.editingTokenId !== prevProps.editingTokenId) {
+    if (this.props.editingTokenIndex !== prevProps.editingTokenIndex) {
       this.initEditingToken();
     }
   }
   initEditingToken() {
-    const token = this.props.tokens[this.props.editingTokenId];
+    const token = this.props.tokens[this.props.editingTokenIndex];
     console.log("token", token, defaultEditingData);
     this.setState({
       editingData: token || defaultEditingData,
@@ -68,15 +68,15 @@ export default class TrafficShaperVPN extends React.Component {
         </ul>
         {this.state.activeTab === MAJOR_APPLICATIONS && (
           <MajorApplications
-            editingTokenId={this.props.editingTokenId}
-            addOrUpdate={this.props.addOrUpdate}
+            editingTokenIndex={this.props.editingTokenIndex}
+            addToken={this.props.addToken}
             removeToken={this.props.removeToken}
             tokens={this.props.tokens}
           />
         )}
         {this.state.activeTab === CUSTOM_EXPRESSIONS && (
           <CustomExpressions
-            editingTokenId={this.props.editingTokenId}
+            editingTokenIndex={this.props.editingTokenIndex}
             tokens={this.props.tokens}
             closeDropdown={this.props.closeDropdown}
             value={this.state.editingData}
@@ -103,7 +103,14 @@ export default class TrafficShaperVPN extends React.Component {
                 };
               });
             }}
-            submit={() => this.props.addOrUpdate(this.state.editingData)}
+            submit={() => {
+              const { editingData, editingTokenIndex } = this.state;
+              if (editingTokenIndex) {
+                this.props.updateToken(editingData, editingTokenIndex);
+              } else {
+                this.props.addToken(editingData);
+              }
+            }}
           />
         )}
       </div>
@@ -133,7 +140,7 @@ const majorApplicationsList = [
   "Zoom"
 ];
 const MajorApplications = (props) => {
-  const { addOrUpdate, tokens, removeToken } = props;
+  const { addToken, tokens, removeToken } = props;
   return (
     <ul
       className="category group-0 iwan_l7"
@@ -158,7 +165,7 @@ const MajorApplications = (props) => {
               if (isActive) {
                 removeToken(tokens.findIndex((t) => t.name === name));
               } else {
-                addOrUpdate({ name, isMajorApplication: true });
+                addToken({ name, isMajorApplication: true });
               }
             }}
           >
@@ -264,7 +271,7 @@ const CustomExpressions = (props) => {
                 props.closeDropdown();
               }}
             >
-              {props.editingTokenId === null
+              {props.editingTokenIndex === null
                 ? "Add expression"
                 : "Update expression"}
             </button>
