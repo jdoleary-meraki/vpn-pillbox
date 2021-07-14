@@ -271,7 +271,12 @@ const CustomExpressions = (props) => {
                 props.closeDropdown();
               }}
             >
-              {props.editingTokenIndex === null
+              {/* Special handling of editing a major application: major applications can't be edited, they
+            can only be toggled on and off, so if the dropdown is opened via clicking on a major application 
+            but the user changes to the custom expressions tab the button shouldn't say "Update expression" 
+            because it would simply be adding a new expression if clicked*/}
+              {props.editingTokenIndex === null &&
+              !props.tokens.find(props.editingTokenIndex).isMajorApplication
                 ? "Add expression"
                 : "Update expression"}
             </button>
