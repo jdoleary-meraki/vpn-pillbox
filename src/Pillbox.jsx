@@ -26,15 +26,14 @@ export default function WithPillbox(WrappedComponent) {
     }
     addOrUpdate(token) {
       const { tokens, editingTokenId } = this.state;
-      console.log("add or update", editingTokenId, tokens, token);
       // If token already exists, update it
       if (tokens[editingTokenId]) {
         this.setState((prevState) => {
           return {
             tokens: [
-              ...prevState.tokens.slice(0, editingTokenId - 1),
+              ...prevState.tokens.slice(0, editingTokenId),
               token,
-              ...prevState.tokens.slice(editingTokenId)
+              ...prevState.tokens.slice(editingTokenId + 1)
             ]
           };
         });

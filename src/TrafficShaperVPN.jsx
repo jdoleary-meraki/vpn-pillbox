@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Formsy from "mki-formsy-react";
+import React from "react";
 import classnames from "classnames";
 const CUSTOM_EXPRESSIONS = "CUSTOM_EXPRESSIONS";
 const MAJOR_APPLICATIONS = "MAJOR_APPLICATIONS";
@@ -9,7 +8,9 @@ export default class TrafficShaperVPN extends React.Component {
     super(props);
     this.state = {
       activeTab: MAJOR_APPLICATIONS,
-      editingData: {}
+      editingData: {
+        protocol: "any"
+      }
     };
   }
   componentDidMount() {
@@ -25,8 +26,8 @@ export default class TrafficShaperVPN extends React.Component {
     const token = this.props.tokens[this.props.editingTokenId];
     console.log("init editing", token);
     if (token) {
-      this.refs.customExpressionsForm.reset(token);
       this.setState({
+        editingData: token,
         activeTab: token.isMajorApplication
           ? MAJOR_APPLICATIONS
           : CUSTOM_EXPRESSIONS
@@ -68,36 +69,62 @@ export default class TrafficShaperVPN extends React.Component {
           />
         )}
         {this.state.activeTab === CUSTOM_EXPRESSIONS && (
-          <Formsy ref="customExpressionsForm">
-            <CustomExpressions
-              editingTokenId={this.props.editingTokenId}
-              tokens={this.props.tokens}
-              closeDropdown={this.props.closeDropdown}
-              value={this.state.editingData}
-              onChange={({ protocol, source, destination }) => {
-                this.setState((prevState) => {
-                  const sourceMerged = { ...prevState.source, ...source };
-                  const destinationMerged = {
-                    ...prevState.destination,
-                    ...destination
+          <CustomExpressions
+            editingTokenId={this.props.editingTokenId}
+            tokens={this.props.tokens}
+            closeDropdown={this.props.closeDropdown}
+            value={this.state.editingData}
+            onChange={({
+              protocol,
+              sourceIp,
+              sourcePort,
+              destinationIp,
+              destinationPort
+            }) => {
+              console.log(
+                "onchange",
+                protocol,
+                sourceIp,
+                sourcePort,
+                destinationIp,
+                destinationPort
+              );
+              this.setState(
+                (prevState) => {
+                  const editingData = {
+                    protocol: protocol || prevState.editingData.protocol,
+                    sourceIp: sourceIp || prevState.editingData.sourceIp,
+                    sourcePort: sourcePort || prevState.editingData.sourcePort,
+                    destinationIp:
+                      destinationIp || prevState.editingData.destinationIp,
+                    destinationPort:
+                      destinationPort || prevState.editingData.destinationPort
                   };
+                  editingData.name = makeNameFromEditingData(editingData);
                   return {
-                    editingData: {
-                      name: `${sourceMerged.ip}:${sourceMerged.port} to ${destinationMerged.ip}:${destinationMerged.port}`,
-                      protocol,
-                      source: sourceMerged,
-                      destination: destinationMerged
-                    }
+                    editingData
                   };
-                });
-              }}
-              submit={() => this.props.addOrUpdate(this.state.editingData)}
-            />
-          </Formsy>
+                },
+                () => {
+                  console.log("state", this.state.editingData);
+                }
+              );
+            }}
+            submit={() => this.props.addOrUpdate(this.state.editingData)}
+          />
         )}
       </div>
     );
   }
+}
+function makeNameFromEditingData({
+  protocol,
+  sourceIp,
+  sourcePort,
+  destinationIp,
+  destinationPort
+}) {
+  return `${protocol}:${sourceIp}:${sourcePort} to ${destinationIp}:${destinationPort}`;
 }
 
 const majorApplicationsList = [
@@ -173,8 +200,13 @@ const MajorApplications = (props) => {
 
 const CustomExpressions = (props) => {
   const { onChange } = props;
-  console.log("value", props.value);
-  const { source, protocol, destination } = props.value;
+  const {
+    protocol,
+    sourceIp,
+    sourcePort,
+    destinationIp,
+    destinationPort
+  } = props.value;
   return (
     <div
       className="category sub custom_pane iwan_l7"
@@ -213,32 +245,22 @@ const CustomExpressions = (props) => {
           </div>
 
           <IpPortInputs
-            ipLabel={"Source"}
-            portLabel={"Src port"}
+            labelIP={"Source"}
+            labelPort={"Src port"}
             name={"source"}
-            value={source || {}}
-            onChange={({ ip, port }) =>
-              onChange({
-                source: {
-                  ip,
-                  port
-                }
-              })
-            }
+            valueIp={sourceIp}
+            valuePort={sourcePort}
+            onChangeIp={(sourceIp) => onChange({ sourceIp })}
+            onChangePort={(sourcePort) => onChange({ sourcePort })}
           />
           <IpPortInputs
-            ipLabel={"Destination"}
-            portLabel={"Dst port"}
+            labelIP={"Destination"}
+            labelPort={"Dst port"}
             name={"destination"}
-            value={destination || {}}
-            onChange={({ ip, port }) =>
-              onChange({
-                destination: {
-                  ip,
-                  port
-                }
-              })
-            }
+            valueIp={destinationIp}
+            valuePort={destinationPort}
+            onChangeIp={(destinationIp) => onChange({ destinationIp })}
+            onChangePort={(destinationPort) => onChange({ destinationPort })}
           />
 
           <div className="iwan_l7 descriptor">
@@ -262,14 +284,22 @@ const CustomExpressions = (props) => {
 
 // TODO how to use hide-when-dns?  Does the ip hide when the ip is CIDR?
 // TODO info tooltips
-const IpPortInputs = ({ ipLabel, portLabel, name, value, onChange }) => {
+const IpPortInputs = ({
+  labelIP,
+  labelPort,
+  name,
+  valueIp,
+  valuePort,
+  onChangeIp,
+  onChangePort
+}) => {
   const portName = `${name}-port`;
   return (
     <div className="iwan_l7 descriptor">
       <div style={{ display: "flex" }}>
         <div style={{ width: "80%" }}>
           <label>
-            {ipLabel}
+            {labelIP}
             <i
               alt="[Help]"
               className="asx_p fa fa-info-circle auto_hohelp idh_4557691403"
@@ -285,10 +315,9 @@ const IpPortInputs = ({ ipLabel, portLabel, name, value, onChange }) => {
                 className="chosen-single"
                 name={name}
                 placeholder="Any"
-                value={value.ip}
+                value={valueIp}
                 onChange={(evt) => {
-                  const ip = evt.target.value;
-                  onChange({ ip });
+                  onChangeIp(evt.target.value);
                 }}
               />
             </div>
@@ -296,7 +325,7 @@ const IpPortInputs = ({ ipLabel, portLabel, name, value, onChange }) => {
         </div>
         <div>
           <label>
-            {portLabel}
+            {labelPort}
             <i
               alt="[Help]"
               className="asx_p fa fa-info-circle auto_hohelp idh_7008731216"
@@ -306,10 +335,9 @@ const IpPortInputs = ({ ipLabel, portLabel, name, value, onChange }) => {
               name={portName}
               placeholder="Any"
               size="4"
-              value={value.port}
+              value={valuePort}
               onChange={(evt) => {
-                const port = evt.target.value;
-                onChange({ port });
+                onChangePort(evt.target.value);
               }}
             />
           </label>
