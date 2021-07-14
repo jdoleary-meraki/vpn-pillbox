@@ -86,6 +86,7 @@ export default function WithPillbox(WrappedComponent) {
                 ))}
                 <div className="actions btn-group">
                   <button
+                    type="button"
                     className="btn btn-default"
                     onClick={() => this.openDropdown()}
                   >
