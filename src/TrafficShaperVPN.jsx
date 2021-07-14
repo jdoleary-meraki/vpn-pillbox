@@ -2,15 +2,21 @@ import React from "react";
 import classnames from "classnames";
 const CUSTOM_EXPRESSIONS = "CUSTOM_EXPRESSIONS";
 const MAJOR_APPLICATIONS = "MAJOR_APPLICATIONS";
+const defaultTab = CUSTOM_EXPRESSIONS;
+const defaultEditingData = {
+  protocol: "any",
+  sourceIp: "",
+  sourcePort: "",
+  destinationIp: "",
+  destinationPort: ""
+};
 // TODO better name for class
 export default class TrafficShaperVPN extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTab: MAJOR_APPLICATIONS,
-      editingData: {
-        protocol: "any"
-      }
+      activeTab: defaultTab,
+      editingData: defaultEditingData
     };
   }
   componentDidMount() {
@@ -24,15 +30,15 @@ export default class TrafficShaperVPN extends React.Component {
   }
   initEditingToken() {
     const token = this.props.tokens[this.props.editingTokenId];
-    console.log("init editing", token);
-    if (token) {
-      this.setState({
-        editingData: token,
-        activeTab: token.isMajorApplication
-          ? MAJOR_APPLICATIONS
-          : CUSTOM_EXPRESSIONS
-      });
-    }
+    console.log("token", token, defaultEditingData);
+    this.setState({
+      editingData: token || defaultEditingData,
+      activeTab: !token
+        ? defaultTab
+        : token.isMajorApplication
+        ? MAJOR_APPLICATIONS
+        : CUSTOM_EXPRESSIONS
+    });
   }
   pickTab(activeTab) {
     this.setState({ activeTab });
@@ -271,7 +277,7 @@ const CustomExpressions = (props) => {
                 props.closeDropdown();
               }}
             >
-              {props.editingTokenId === -1
+              {props.editingTokenId === null
                 ? "Add expression"
                 : "Update expression"}
             </button>
