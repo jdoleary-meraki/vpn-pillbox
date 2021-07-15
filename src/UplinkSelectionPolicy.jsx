@@ -34,7 +34,10 @@ export default class UplinkSelectionPolicy extends React.Component {
         </div>
         {["WAN 1", "WAN 2", "Load Balance"].indexOf(uplink) !== -1 && (
           <>
-            <div className="chosen-container-single" style={{ width: "70%" }}>
+            <div
+              className="chosen-container-single trafficShaperVPN-row"
+              style={{ width: "70%" }}
+            >
               <label>
                 Fail over if:
                 <select
@@ -52,7 +55,10 @@ export default class UplinkSelectionPolicy extends React.Component {
               </label>
             </div>
             {fail_over === "Poor performance" && (
-              <div className="chosen-container-single" style={{ width: "70%" }}>
+              <div
+                className="chosen-container-single trafficShaperVPN-row"
+                style={{ width: "70%" }}
+              >
                 <label>
                   On uplinks that meet performance class:
                   <select

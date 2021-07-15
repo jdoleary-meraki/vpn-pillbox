@@ -204,11 +204,8 @@ const CustomExpressions = (props) => {
   return (
     <div
       style={{
-        height: "315px",
         width: "100%",
-        display: "block",
-        paddingLeft: "2ex",
-        marginRight: "-2ex"
+        padding: "0 0 2ex 2ex"
       }}
     >
       <h3>Custom expressions</h3>
@@ -315,19 +312,17 @@ const IpPortInputs = ({
   return (
     <div className="iwan_l7 trafficShaperVPN-row">
       <div style={{ display: "flex" }}>
-        <div style={{ width: "80%" }}>
+        <div>
           <label>
             {labelIP}
             <i
               alt="[Help]"
               className="asx_p fa fa-info-circle auto_hohelp idh_4557691403"
             ></i>
-
+            <br />
             <div
               className="chosen-container chosen-container-single chosen-container-single-nosearch chosen-container-active"
-              title=""
-              id=""
-              style={{ width: "100%" }}
+              style={{ marginRight: "8px" }}
             >
               <input
                 className="chosen-single"
@@ -349,15 +344,18 @@ const IpPortInputs = ({
               className="asx_p fa fa-info-circle auto_hohelp idh_7008731216"
             ></i>
             <br />
-            <input
-              name={portName}
-              placeholder="Any"
-              size="4"
-              value={valuePort}
-              onChange={(evt) => {
-                onChangePort(evt.target.value);
-              }}
-            />
+            <div className="chosen-container chosen-container-single chosen-container-single-nosearch chosen-container-active">
+              <input
+                className="chosen-single"
+                name={portName}
+                placeholder="Any"
+                size="4"
+                value={valuePort}
+                onChange={(evt) => {
+                  onChangePort(evt.target.value);
+                }}
+              />
+            </div>
           </label>
         </div>
       </div>
