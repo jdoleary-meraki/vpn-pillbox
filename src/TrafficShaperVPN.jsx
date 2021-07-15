@@ -1,6 +1,7 @@
 import React from "react";
 import classnames from "classnames";
 import "./TrafficShaperVPN.scss";
+import UplinkSelectionPolicy from "./UplinkSelectionPolicy";
 const CUSTOM_EXPRESSIONS = "CUSTOM_EXPRESSIONS";
 const MAJOR_APPLICATIONS = "MAJOR_APPLICATIONS";
 const defaultTab = CUSTOM_EXPRESSIONS;
@@ -12,6 +13,7 @@ const defaultEditingData = {
   destinationPort: ""
 };
 // TODO better name for class
+// TODO validate IP / port format in input
 export default class TrafficShaperVPN extends React.Component {
   constructor(props) {
     super(props);
@@ -195,88 +197,85 @@ const CustomExpressions = (props) => {
         <span>Custom expressions</span>
       </h3>
 
-      <div>
-        <div>
-          <div className="chosen-container-single" style={{ width: "70%" }}>
-            <label>
-              Protocol
-              <select
-                className="protocol chosen-single"
-                style={{ width: "100%" }}
-                value={protocol}
-                onChange={(evt) => {
-                  onChange({ protocol: evt.target.value });
-                }}
-              >
-                <option value="tcp">TCP</option>
-                <option value="udp">UDP</option>
-                <option value="icmp">ICMP</option>
-                <option value="dns">DNS</option>
-                <option value="any">Any</option>
-              </select>
-            </label>
-          </div>
+      <div className="chosen-container-single" style={{ width: "70%" }}>
+        <label>
+          Protocol
+          <select
+            className="protocol chosen-single"
+            style={{ width: "100%" }}
+            value={protocol}
+            onChange={(evt) => {
+              onChange({ protocol: evt.target.value });
+            }}
+          >
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+            <option value="icmp">ICMP</option>
+            <option value="dns">DNS</option>
+            <option value="any">Any</option>
+          </select>
+        </label>
+      </div>
 
-          <IpPortInputs
-            labelIP={"Source"}
-            labelPort={"Src port"}
-            name={"source"}
-            valueIp={sourceIp}
-            valuePort={sourcePort}
-            onChangeIp={(sourceIp) => onChange({ sourceIp })}
-            onChangePort={(sourcePort) => onChange({ sourcePort })}
-          />
-          {useMajorApplications ? (
-            <div
-              className="chosen-container-single trafficShaperVPN-row"
-              style={{ width: "70%" }}
+      <IpPortInputs
+        labelIP={"Source"}
+        labelPort={"Src port"}
+        name={"source"}
+        valueIp={sourceIp}
+        valuePort={sourcePort}
+        onChangeIp={(sourceIp) => onChange({ sourceIp })}
+        onChangePort={(sourcePort) => onChange({ sourcePort })}
+      />
+      {useMajorApplications ? (
+        <div
+          className="chosen-container-single trafficShaperVPN-row"
+          style={{ width: "70%" }}
+        >
+          <label>
+            Destination
+            <select
+              className="protocol chosen-single"
+              style={{ width: "100%" }}
+              value={majorApplication}
+              onChange={(event) =>
+                onChange({ majorApplication: event.target.value })
+              }
             >
-              <label>
-                Destination
-                <select
-                  className="protocol chosen-single"
-                  style={{ width: "100%" }}
-                  value={majorApplication}
-                  onChange={(event) =>
-                    onChange({ majorApplication: event.target.value })
-                  }
-                >
-                  {majorApplicationsList.map((app) => (
-                    <option value={app}>{app}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          ) : (
-            <IpPortInputs
-              labelIP={"Destination"}
-              labelPort={"Dst port"}
-              name={"destination"}
-              valueIp={destinationIp}
-              valuePort={destinationPort}
-              onChangeIp={(destinationIp) => onChange({ destinationIp })}
-              onChangePort={(destinationPort) => onChange({ destinationPort })}
-            />
-          )}
+              {majorApplicationsList.map((app) => (
+                <option value={app}>{app}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      ) : (
+        <IpPortInputs
+          labelIP={"Destination"}
+          labelPort={"Dst port"}
+          name={"destination"}
+          valueIp={destinationIp}
+          valuePort={destinationPort}
+          onChangeIp={(destinationIp) => onChange({ destinationIp })}
+          onChangePort={(destinationPort) => onChange({ destinationPort })}
+        />
+      )}
+      <UplinkSelectionPolicy />
 
-          <div className="iwan_l7 trafficShaperVPN-row">
-            <button
-              type="button"
-              onClick={() => {
-                props.submit();
-                props.closeDropdown();
-              }}
-            >
-              {/* Special handling of editing a major application: major applications can't be edited, they
+      <div className="iwan_l7 trafficShaperVPN-row">
+        <button
+          type="button"
+          onClick={() => {
+            props.submit();
+            props.closeDropdown();
+          }}
+        >
+          {/* Special handling of editing a major application: major applications can't be edited, they
             can only be toggled on and off, so if the dropdown is opened via clicking on a major application
             but the user changes to the custom expressions tab the button shouldn't say "Update expression"
             because it would simply be adding a new expression if clicked*/}
-              {props.editingTokenIndex === null
-                ? "Add expression"
-                : "Update expression"}
-            </button>
-          </div>
-        </div>
+          {props.editingTokenIndex === null
+            ? "Add expression"
+            : "Update expression"}
+        </button>
       </div>
     </div>
   );
