@@ -1,26 +1,20 @@
 import React from "react";
-const uplinkOptions = [
+export const uplinkOptions = [
   "WAN 1",
   "WAN 2",
   "Best for VoIP",
   "Load Balance",
   "Global Preference"
 ];
-const failOverOptions = ["Poor performance", "Uplink Down"];
-const performanceClassOptions = ["VoIP"];
+export const failOverOptions = ["Poor performance", "Uplink Down"];
+export const performanceClassOptions = ["VoIP"];
 export default class UplinkSelectionPolicy extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      uplink: uplinkOptions[0],
-      failOver: failOverOptions[0],
-      forPerformanceClass: performanceClassOptions[0]
-    };
-  }
   render() {
-    const { uplink, failOver, forPerformanceClass } = this.state;
+    const { onChange, value } = this.props;
+    const { uplink, fail_over, performance_category } = value;
     return (
       <div className="trafficShaperVPN-row">
+        <h3>Policy</h3>
         <div className="chosen-container-single" style={{ width: "70%" }}>
           <label>
             Preferred uplink
@@ -29,7 +23,7 @@ export default class UplinkSelectionPolicy extends React.Component {
               style={{ width: "100%" }}
               value={uplink}
               onChange={(evt) => {
-                this.setState({ uplink: evt.target.value });
+                onChange({ uplink: evt.target.value });
               }}
             >
               {uplinkOptions.map((o) => (
@@ -46,9 +40,9 @@ export default class UplinkSelectionPolicy extends React.Component {
                 <select
                   className="protocol chosen-single"
                   style={{ width: "100%" }}
-                  value={failOver}
+                  value={fail_over}
                   onChange={(evt) => {
-                    this.setState({ failOver: evt.target.value });
+                    onChange({ fail_over: evt.target.value });
                   }}
                 >
                   {failOverOptions.map((o) => (
@@ -57,16 +51,16 @@ export default class UplinkSelectionPolicy extends React.Component {
                 </select>
               </label>
             </div>
-            {failOver === "Poor performance" && (
+            {fail_over === "Poor performance" && (
               <div className="chosen-container-single" style={{ width: "70%" }}>
                 <label>
                   On uplinks that meet performance class:
                   <select
                     className="protocol chosen-single"
                     style={{ width: "100%" }}
-                    value={forPerformanceClass}
+                    value={performance_category}
                     onChange={(evt) => {
-                      this.setState({ forPerformanceClass: evt.target.value });
+                      onChange({ performance_category: evt.target.value });
                     }}
                   >
                     {performanceClassOptions.map((o) => (

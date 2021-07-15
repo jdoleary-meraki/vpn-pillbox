@@ -1,7 +1,11 @@
 import React from "react";
 import classnames from "classnames";
 import "./TrafficShaperVPN.scss";
-import UplinkSelectionPolicy from "./UplinkSelectionPolicy";
+import UplinkSelectionPolicy, {
+  uplinkOptions,
+  failOverOptions,
+  performanceClassOptions
+} from "./UplinkSelectionPolicy";
 const CUSTOM_EXPRESSIONS = "CUSTOM_EXPRESSIONS";
 const MAJOR_APPLICATIONS = "MAJOR_APPLICATIONS";
 const defaultTab = CUSTOM_EXPRESSIONS;
@@ -10,7 +14,10 @@ const defaultEditingData = {
   sourceIp: "",
   sourcePort: "",
   destinationIp: "",
-  destinationPort: ""
+  destinationPort: "",
+  uplink: uplinkOptions[0],
+  fail_over: failOverOptions[0],
+  performance_category: performanceClassOptions[0]
 };
 // TODO better name for class
 // TODO validate IP / port format in input
@@ -108,7 +115,10 @@ export default class TrafficShaperVPN extends React.Component {
             sourcePort,
             destinationIp,
             destinationPort,
-            majorApplication
+            majorApplication,
+            uplink,
+            fail_over,
+            performance_category
           }) => {
             this.setState((prevState) => {
               const editingData = {
@@ -116,7 +126,12 @@ export default class TrafficShaperVPN extends React.Component {
                 sourceIp: sourceIp || prevState.editingData.sourceIp,
                 sourcePort: sourcePort || prevState.editingData.sourcePort,
                 majorApplication:
-                  majorApplication || prevState.editingData.majorApplication
+                  majorApplication || prevState.editingData.majorApplication,
+                uplink: uplink || prevState.editingData.uplink,
+                fail_over: fail_over || prevState.editingData.fail_over,
+                performance_category:
+                  performance_category ||
+                  prevState.editingData.performance_category
               };
               // A token can have either a major application or a destination
               // This is because a majorApplication can be chosen AS a destination
@@ -181,7 +196,10 @@ const CustomExpressions = (props) => {
     sourcePort,
     destinationIp,
     destinationPort,
-    majorApplication
+    majorApplication,
+    uplink,
+    fail_over,
+    performance_category
   } = props.value;
   return (
     <div
@@ -193,9 +211,7 @@ const CustomExpressions = (props) => {
         marginRight: "-2ex"
       }}
     >
-      <h3>
-        <span>Custom expressions</span>
-      </h3>
+      <h3>Custom expressions</h3>
 
       <div className="chosen-container-single" style={{ width: "70%" }}>
         <label>
@@ -258,7 +274,10 @@ const CustomExpressions = (props) => {
           onChangePort={(destinationPort) => onChange({ destinationPort })}
         />
       )}
-      <UplinkSelectionPolicy />
+      <UplinkSelectionPolicy
+        value={{ uplink, fail_over, performance_category }}
+        onChange={onChange}
+      />
 
       <div className="iwan_l7 trafficShaperVPN-row">
         <button
