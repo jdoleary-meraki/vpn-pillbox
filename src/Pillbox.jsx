@@ -8,24 +8,26 @@ export default function WithPillbox(WrappedComponent) {
         tokens: [],
         activeTab: 0,
         isDropdownOpen: false,
-        editingTokenId: null
+        editingTokenIndex: null
       };
       this.addToken = this.addToken.bind(this);
       this.updateToken = this.updateToken.bind(this);
       this.removeToken = this.removeToken.bind(this);
       this.closeDropdown = this.closeDropdown.bind(this);
     }
+
     pickTab(activeTab) {
       this.setState({ activeTab });
     }
+
     removeToken(index) {
-      console.log("removeToken", index, this.state.tokens);
       this.setState((prevState) => {
         return {
           tokens: prevState.tokens.filter((token, i) => i !== index)
         };
       });
     }
+
     updateToken(token, index) {
       const { tokens } = this.state;
       if (tokens[index]) {
@@ -42,6 +44,7 @@ export default function WithPillbox(WrappedComponent) {
         console.error("Could not update token at index", index);
       }
     }
+
     addToken(token) {
       this.setState((prevState) => {
         return {
@@ -49,20 +52,26 @@ export default function WithPillbox(WrappedComponent) {
         };
       });
     }
-    openDropdown(editingTokenId = null) {
+
+    openDropdown(evt, editingTokenIndex = null) {
+      console.log("stop propagation");
+      evt.stopPropagation();
       this.setState({
         isDropdownOpen: true,
-        editingTokenId
+        editingTokenIndex
       });
     }
+
     closeDropdown() {
       this.setState({
         isDropdownOpen: false,
         // Clear the state that determines which token is being edited
-        editingTokenId: null
+        editingTokenIndex: null
       });
     }
+
     render() {
+      console.log("render", this.state.isDropdownOpen);
       return (
         <div>
           <div className="tclass">
@@ -72,7 +81,7 @@ export default function WithPillbox(WrappedComponent) {
                   <Token
                     key={token.name}
                     name={token.name}
-                    onClick={() => this.openDropdown(index)}
+                    onClick={(evt) => this.openDropdown(evt, index)}
                     onRemove={() =>
                       this.setState((previousState) => {
                         return {
@@ -88,7 +97,7 @@ export default function WithPillbox(WrappedComponent) {
                   <button
                     type="button"
                     className="btn btn-default"
-                    onClick={() => this.openDropdown()}
+                    onClick={(evt) => this.openDropdown(evt)}
                   >
                     Add&nbsp;
                     <i className="fa fa-plus plus"></i>
@@ -99,7 +108,6 @@ export default function WithPillbox(WrappedComponent) {
               <div
                 id="rule_menu_vpn_exclusion_shaper"
                 className="btn-group dropdown open"
-                data-domplate="id"
                 style={{ display: "block" }}
               >
                 <a
@@ -119,7 +127,7 @@ export default function WithPillbox(WrappedComponent) {
                     addToken={this.addToken}
                     updateToken={this.updateToken}
                     removeToken={this.removeToken}
-                    editingTokenId={this.state.editingTokenId}
+                    editingTokenIndex={this.state.editingTokenIndex}
                     closeDropdown={this.closeDropdown}
                   />
                 )}
@@ -135,6 +143,7 @@ const Token = ({ name, onClick, onRemove }) => {
   return (
     <div className="token" style={{ cursor: "pointer" }} onClick={onClick}>
       <span className="content">
+        {/* TODO WHEN SHOULD IT SAY "Layer 3"?? */}
         <span className="small_print">Layer 3&nbsp;</span>
         <span className="value">{name}</span>
         <input
