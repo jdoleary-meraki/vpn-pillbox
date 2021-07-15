@@ -56,7 +56,7 @@ export default class TrafficShaperVPN extends React.Component {
       editingData: token || defaultEditingData,
       activeTab: !token
         ? defaultTab
-        : token.isMajorApplication
+        : token.majorApplication
         ? MAJOR_APPLICATIONS
         : CUSTOM_EXPRESSIONS
     });
@@ -155,7 +155,7 @@ function makeNameFromEditingData({
   majorApplication
 }) {
   const dest = majorApplication || `${destinationIp}:${destinationPort}`;
-  return `${protocol}:${sourceIp}:${sourcePort} to ${dest}`;
+  return `${protocol} ${sourceIp}:${sourcePort} to ${dest}`;
 }
 
 const majorApplicationsList = [
@@ -170,70 +170,6 @@ const majorApplicationsList = [
   "Webex",
   "Zoom"
 ];
-const MajorApplications = (props) => {
-  const { addToken, tokens, removeToken } = props;
-  return (
-    <div
-      style={{
-        width: "100%"
-      }}
-    >
-      <ul
-        className="category group-0 iwan_l7"
-        style={{ display: "block", height: "315px" }}
-      >
-        {majorApplicationsList.map((name) => {
-          const isActive = tokens
-            .filter((t) => t.isMajorApplication)
-            .find((t) => t.name === name);
-          return (
-            <li
-              key={name}
-              style={{
-                backgroundColor: isActive ? "#e6e6e6" : undefined,
-                margin: 0,
-                textAlign: "left",
-                width: "100%",
-                display: "block",
-                cursor: "pointer"
-              }}
-              onClick={() => {
-                if (isActive) {
-                  removeToken(tokens.findIndex((t) => t.name === name));
-                } else {
-                  addToken({ name, isMajorApplication: true });
-                }
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between"
-                }}
-              >
-                <div
-                  style={{
-                    padding: "1ex 0 1ex 2ex"
-                  }}
-                >
-                  {name}
-                </div>
-                <div
-                  style={{
-                    float: "right",
-                    padding: "1ex 2ex 1ex 2ex"
-                  }}
-                >
-                  <i className="active fa fa-remove"></i>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-};
 
 const CustomExpressions = (props) => {
   const { onChange, useMajorApplications } = props;
@@ -335,10 +271,7 @@ const CustomExpressions = (props) => {
             can only be toggled on and off, so if the dropdown is opened via clicking on a major application
             but the user changes to the custom expressions tab the button shouldn't say "Update expression"
             because it would simply be adding a new expression if clicked*/}
-              {props.editingTokenIndex === null ||
-              !props.tokens.find(
-                (_, index) => index === props.editingTokenIndex
-              )?.isMajorApplication
+              {props.editingTokenIndex === null
                 ? "Add expression"
                 : "Update expression"}
             </button>
