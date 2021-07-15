@@ -53,9 +53,7 @@ export default function WithPillbox(WrappedComponent) {
       });
     }
 
-    openDropdown(evt, editingTokenIndex = null) {
-      console.log("stop propagation");
-      evt.stopPropagation();
+    openDropdown(editingTokenIndex = null) {
       this.setState({
         isDropdownOpen: true,
         editingTokenIndex
@@ -71,7 +69,6 @@ export default function WithPillbox(WrappedComponent) {
     }
 
     render() {
-      console.log("render", this.state.isDropdownOpen);
       return (
         <div>
           <div className="tclass">
@@ -81,7 +78,7 @@ export default function WithPillbox(WrappedComponent) {
                   <Token
                     key={token.name}
                     name={token.name}
-                    onClick={(evt) => this.openDropdown(evt, index)}
+                    onClick={() => this.openDropdown(index)}
                     onRemove={() =>
                       this.setState((previousState) => {
                         return {
@@ -97,7 +94,7 @@ export default function WithPillbox(WrappedComponent) {
                   <button
                     type="button"
                     className="btn btn-default"
-                    onClick={(evt) => this.openDropdown(evt)}
+                    onClick={() => this.openDropdown()}
                   >
                     Add&nbsp;
                     <i className="fa fa-plus plus"></i>
@@ -143,8 +140,6 @@ const Token = ({ name, onClick, onRemove }) => {
   return (
     <div className="token" style={{ cursor: "pointer" }} onClick={onClick}>
       <span className="content">
-        {/* TODO WHEN SHOULD IT SAY "Layer 3"?? */}
-        <span className="small_print">Layer 3&nbsp;</span>
         <span className="value">{name}</span>
         <input
           type="hidden"
